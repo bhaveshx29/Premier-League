@@ -283,12 +283,25 @@ class PremierLeaguePredictor:
         """Get list of available teams."""
         try:
             df = self.pull_premier_league_team_passing()
+            teams = df["Squad"].tolist()
+            if len(teams) > 0:
+                return {
+                    "success": True,
+                    "teams": sorted(teams)
+                }
+            else:
+                raise Exception("No teams found in scraped data")
+        except Exception as e:
+            # Return fallback list with error info
+            fallback_teams = [
+                'Arsenal', 'Aston Villa', 'Brighton', 'Burnley', 'Chelsea', 
+                'Crystal Palace', 'Everton', 'Fulham', 'Liverpool', 'Luton Town',
+                'Manchester City', 'Manchester Utd', 'Newcastle Utd', 'Nottingham Forest',
+                'Sheffield Utd', 'Tottenham', 'West Ham', 'Wolves', 'Bournemouth', 'Brentford'
+            ]
             return {
                 "success": True,
-                "teams": sorted(df["Squad"].tolist())
-            }
-        except Exception as e:
-            return {
-                "success": False,
+                "teams": fallback_teams,
+                "fallback": True,
                 "error": str(e)
             }

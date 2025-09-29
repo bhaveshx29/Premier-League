@@ -40,12 +40,34 @@ export default function Home() {
 
   const fetchAvailableTeams = async () => {
     try {
+      console.log('Fetching teams from /api/teams...');
       const response = await fetch('/api/teams');
+      console.log('Response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
-        if (data.success) {
+        console.log('Teams API response:', data);
+        
+        if (data.success && data.teams && Array.isArray(data.teams)) {
+          console.log('Setting teams:', data.teams);
           setAvailableTeams(data.teams);
+        } else {
+          console.log('API response invalid, using fallback');
+          setAvailableTeams([
+            'Arsenal', 'Aston Villa', 'Brighton', 'Burnley', 'Chelsea', 
+            'Crystal Palace', 'Everton', 'Fulham', 'Liverpool', 'Luton Town',
+            'Manchester City', 'Manchester Utd', 'Newcastle Utd', 'Nottingham Forest',
+            'Sheffield Utd', 'Tottenham', 'West Ham', 'Wolves', 'Bournemouth', 'Brentford'
+          ]);
         }
+      } else {
+        console.log('Response not ok, using fallback');
+        setAvailableTeams([
+          'Arsenal', 'Aston Villa', 'Brighton', 'Burnley', 'Chelsea', 
+          'Crystal Palace', 'Everton', 'Fulham', 'Liverpool', 'Luton Town',
+          'Manchester City', 'Manchester Utd', 'Newcastle Utd', 'Nottingham Forest',
+          'Sheffield Utd', 'Tottenham', 'West Ham', 'Wolves', 'Bournemouth', 'Brentford'
+        ]);
       }
     } catch (error) {
       console.error('Failed to fetch teams:', error);

@@ -49,6 +49,10 @@ class handler(BaseHTTPRequestHandler):
             predictor = PremierLeaguePredictor()
             result = predictor.get_available_teams()
             
+            # If scraping failed, use fallback teams
+            if not result.get('success', False):
+                raise Exception("Scraping failed, using fallback")
+            
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
