@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 
 const premierLeagueTeams = [
@@ -44,18 +43,19 @@ export function PredictionForm({ onPredict, isLoading }: PredictionFormProps) {
           {/* Team 1 Selection */}
           <div className="space-y-2">
             <label className="text-sm font-medium">First Team</label>
-            <Select value={team1} onValueChange={setTeam1} disabled={isLoading}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select first team" />
-              </SelectTrigger>
-              <SelectContent>
-                {premierLeagueTeams.map((team) => (
-                  <SelectItem key={team} value={team}>
-                    {team}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <select
+              value={team1}
+              onChange={(e) => setTeam1(e.target.value)}
+              disabled={isLoading}
+              className="w-full p-3 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+            >
+              <option value="">Select first team</option>
+              {premierLeagueTeams.map((team) => (
+                <option key={team} value={team}>
+                  {team}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* VS Divider */}
@@ -68,20 +68,21 @@ export function PredictionForm({ onPredict, isLoading }: PredictionFormProps) {
           {/* Team 2 Selection */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Second Team</label>
-            <Select value={team2} onValueChange={setTeam2} disabled={isLoading}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select second team" />
-              </SelectTrigger>
-              <SelectContent>
-                {premierLeagueTeams
-                  .filter(team => team !== team1)
-                  .map((team) => (
-                    <SelectItem key={team} value={team}>
-                      {team}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
+            <select
+              value={team2}
+              onChange={(e) => setTeam2(e.target.value)}
+              disabled={isLoading}
+              className="w-full p-3 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+            >
+              <option value="">Select second team</option>
+              {premierLeagueTeams
+                .filter(team => team !== team1)
+                .map((team) => (
+                  <option key={team} value={team}>
+                    {team}
+                  </option>
+                ))}
+            </select>
           </div>
 
           {/* Match Preview */}
