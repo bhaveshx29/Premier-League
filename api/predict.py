@@ -1,44 +1,9 @@
 from http.server import BaseHTTPRequestHandler
 import json
-import sys
-import os
+import random
 
-# Add the current directory to Python path
-sys.path.insert(0, os.path.dirname(__file__))
-
-from predictor import PremierLeaguePredictor
 
 class handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        # In Vercel, the path is relative to the function file
-        if self.path == '/' or self.path == '/health':
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            response = {"status": "healthy", "message": "Premier League Predictor API"}
-            self.wfile.write(json.dumps(response).encode())
-            
-        elif self.path == '/teams':
-            self.handle_teams()
-            
-        elif self.path.startswith('/predict/'):
-            self.handle_prediction_get()
-            
-        else:
-            self.send_response(404)
-            self.end_headers()
-            self.wfile.write(b'Not Found')
-
-    def do_POST(self):
-        # Handle POST requests - in Vercel, path might be just '/' for the function
-        if self.path == '/' or self.path == '/predict':
-            self.handle_prediction_post()
-        else:
-            self.send_response(404)
-            self.end_headers()
-            self.wfile.write(b'Not Found')
-
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -46,39 +11,7 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
 
-    def handle_teams(self):
-        try:
-            predictor = PremierLeaguePredictor()
-            result = predictor.get_available_teams()
-            
-            # If scraping failed, use fallback teams
-            if not result.get('success', False):
-                raise Exception("Scraping failed, using fallback")
-            
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(result).encode())
-            
-        except Exception as e:
-            # Fallback teams list
-            fallback_teams = [
-                'Arsenal', 'Aston Villa', 'Brighton', 'Burnley', 'Chelsea', 
-                'Crystal Palace', 'Everton', 'Fulham', 'Liverpool', 'Luton Town',
-                'Manchester City', 'Manchester Utd', 'Newcastle Utd', 'Nottingham Forest',
-                'Sheffield Utd', 'Tottenham', 'West Ham', 'Wolves', 'Bournemouth', 'Brentford'
-            ]
-            
-            result = {"success": True, "teams": fallback_teams}
-            
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(result).encode())
-
-    def handle_prediction_post(self):
+    def do_POST(self):
         try:
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -94,7 +27,7 @@ class handler(BaseHTTPRequestHandler):
             if team1 == team2:
                 raise ValueError("Teams must be different")
             
-            # Create mock prediction since web scraping doesn't work in Vercel
+            # Create mock prediction
             result = self.create_mock_prediction(team1, team2, prediction_type)
             
             self.send_response(200)
@@ -117,45 +50,8 @@ class handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(error_result).encode())
 
-    def handle_prediction_get(self):
-        try:
-            # Parse URL like /api/predict/basic/team1/team2 or /api/predict/advanced/team1/team2
-            path_parts = self.path.split('/')
-            if len(path_parts) < 6:
-                raise ValueError("Invalid URL format")
-            
-            prediction_type = path_parts[3]  # basic or advanced
-            team1 = path_parts[4].replace('%20', ' ')
-            team2 = path_parts[5].replace('%20', ' ')
-            
-            predictor = PremierLeaguePredictor()
-            
-            if prediction_type == 'basic':
-                result = predictor.basic_prediction([team1, team2])
-            else:
-                result = predictor.advanced_prediction([team1, team2])
-            
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(result).encode())
-            
-        except Exception as e:
-            error_result = {
-                "success": False,
-                "error": str(e)
-            }
-            
-            self.send_response(500)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(error_result).encode())
-
     def create_mock_prediction(self, team1, team2, prediction_type):
-        """Create a mock prediction result since web scraping doesn't work in Vercel."""
-        import random
+        """Create a mock prediction result."""
         
         # Generate mock scores
         team1_score = round(random.uniform(0.5, 3.0), 1)
