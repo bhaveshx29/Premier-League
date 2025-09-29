@@ -6,6 +6,11 @@ import { PredictionResult } from '@/components/PredictionResult';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 
+interface TeamStats {
+  Squad: string;
+  [key: string]: string | number;
+}
+
 interface PredictionData {
   success: boolean;
   prediction_type: string;
@@ -19,7 +24,7 @@ interface PredictionData {
     team2_value: number;
     winner: string;
   }>;
-  stats_summary: Array<Record<string, any>>;
+  stats_summary: TeamStats[];
   disclaimer?: string;
   error?: string;
 }

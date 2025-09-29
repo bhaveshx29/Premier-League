@@ -1,6 +1,4 @@
-interface HeaderProps {}
-
-export function Header({}: HeaderProps) {
+export function Header() {
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm border-b">
       <nav className="container mx-auto px-4 py-4">

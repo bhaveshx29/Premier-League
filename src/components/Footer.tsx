@@ -1,6 +1,4 @@
-interface FooterProps {}
-
-export function Footer({}: FooterProps) {
+export function Footer() {
   return (
     <footer className="bg-white dark:bg-gray-800 border-t mt-16">
       <div className="container mx-auto px-4 py-8">
