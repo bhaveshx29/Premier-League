@@ -32,53 +32,6 @@ interface PredictionData {
 export default function Home() {
   const [predictionData, setPredictionData] = useState<PredictionData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [availableTeams, setAvailableTeams] = useState<string[]>([]);
-
-  useEffect(() => {
-    fetchAvailableTeams();
-  }, []);
-
-  const fetchAvailableTeams = async () => {
-    try {
-      console.log('Fetching teams from /api/teams...');
-      const response = await fetch('/api/teams');
-      console.log('Response status:', response.status);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Teams API response:', data);
-        
-        if (data.success && data.teams && Array.isArray(data.teams)) {
-          console.log('Setting teams:', data.teams);
-          setAvailableTeams(data.teams);
-        } else {
-          console.log('API response invalid, using fallback');
-          setAvailableTeams([
-            'Arsenal', 'Aston Villa', 'Brighton', 'Burnley', 'Chelsea', 
-            'Crystal Palace', 'Everton', 'Fulham', 'Liverpool', 'Luton Town',
-            'Manchester City', 'Manchester Utd', 'Newcastle Utd', 'Nottingham Forest',
-            'Sheffield Utd', 'Tottenham', 'West Ham', 'Wolves', 'Bournemouth', 'Brentford'
-          ]);
-        }
-      } else {
-        console.log('Response not ok, using fallback');
-        setAvailableTeams([
-          'Arsenal', 'Aston Villa', 'Brighton', 'Burnley', 'Chelsea', 
-          'Crystal Palace', 'Everton', 'Fulham', 'Liverpool', 'Luton Town',
-          'Manchester City', 'Manchester Utd', 'Newcastle Utd', 'Nottingham Forest',
-          'Sheffield Utd', 'Tottenham', 'West Ham', 'Wolves', 'Bournemouth', 'Brentford'
-        ]);
-      }
-    } catch (error) {
-      console.error('Failed to fetch teams:', error);
-      setAvailableTeams([
-        'Arsenal', 'Aston Villa', 'Brighton', 'Burnley', 'Chelsea', 
-        'Crystal Palace', 'Everton', 'Fulham', 'Liverpool', 'Luton Town',
-        'Manchester City', 'Manchester Utd', 'Newcastle Utd', 'Nottingham Forest',
-        'Sheffield Utd', 'Tottenham', 'West Ham', 'Wolves', 'Bournemouth', 'Brentford'
-      ]);
-    }
-  };
 
   const handlePrediction = async (team1: string, team2: string, predictionType: string) => {
     setIsLoading(true);
@@ -138,7 +91,6 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-8 items-start">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
               <PredictionForm
-                availableTeams={availableTeams}
                 onPredict={handlePrediction}
                 isLoading={isLoading}
               />

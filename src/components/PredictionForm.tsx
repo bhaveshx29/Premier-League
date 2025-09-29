@@ -3,12 +3,11 @@
 import { useState } from 'react';
 
 interface PredictionFormProps {
-  availableTeams: string[];
   onPredict: (team1: string, team2: string, predictionType: string) => void;
   isLoading: boolean;
 }
 
-export function PredictionForm({ availableTeams, onPredict, isLoading }: PredictionFormProps) {
+export function PredictionForm({ onPredict, isLoading }: PredictionFormProps) {
   const [team1, setTeam1] = useState('');
   const [team2, setTeam2] = useState('');
   const [predictionType, setPredictionType] = useState('basic');
@@ -16,27 +15,11 @@ export function PredictionForm({ availableTeams, onPredict, isLoading }: Predict
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Debug: log available teams and user input
-    console.log('Available teams:', availableTeams);
-    console.log('User input - Team 1:', team1);
-    console.log('User input - Team 2:', team2);
-    
-    // Check if the entered team names exist in the available teams (case-insensitive)
-    const team1Match = availableTeams.find(team => 
-      team.toLowerCase().trim() === team1.toLowerCase().trim()
-    );
-    const team2Match = availableTeams.find(team => 
-      team.toLowerCase().trim() === team2.toLowerCase().trim()
-    );
-    
-    console.log('Team 1 match found:', team1Match);
-    console.log('Team 2 match found:', team2Match);
-    
-    if (team1Match && team2Match && team1Match !== team2Match) {
-      onPredict(team1Match, team2Match, predictionType);
-    } else if (!team1Match || !team2Match) {
-      alert(`Please enter valid Premier League team names. Available teams include: ${availableTeams.slice(0, 5).join(', ')}, etc.`);
-    } else if (team1Match === team2Match) {
+    if (team1.trim() && team2.trim() && team1.trim() !== team2.trim()) {
+      onPredict(team1.trim(), team2.trim(), predictionType);
+    } else if (!team1.trim() || !team2.trim()) {
+      alert('Please enter both team names.');
+    } else if (team1.trim() === team2.trim()) {
       alert('Please enter two different teams.');
     }
   };
@@ -124,19 +107,6 @@ export function PredictionForm({ availableTeams, onPredict, isLoading }: Predict
             />
           </div>
         </div>
-
-        {/* Available Teams Helper */}
-        {availableTeams.length > 0 && (
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Available Teams:
-            </h3>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              {availableTeams.slice(0, 10).join(', ')}
-              {availableTeams.length > 10 && `, ... and ${availableTeams.length - 10} more`}
-            </div>
-          </div>
-        )}
 
         {/* Submit Button */}
         <button
