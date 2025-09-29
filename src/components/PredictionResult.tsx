@@ -28,13 +28,21 @@ interface PredictionResultProps {
 export function PredictionResult({ data }: PredictionResultProps) {
   if (!data.success) {
     return (
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-          Prediction Error
-        </h2>
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
-          <div className="text-red-800 dark:text-red-200">
-            {data.error || 'An error occurred during prediction'}
+      <div className="space-y-6">
+        <div className="text-center">
+          <div className="text-6xl mb-4">❌</div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
+            Prediction Error
+          </h2>
+        </div>
+        <div className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/20 border-2 border-red-300 dark:border-red-700 rounded-2xl p-6">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold">!</span>
+            </div>
+            <div className="text-red-800 dark:text-red-200 font-medium">
+              {data.error || 'An error occurred during prediction'}
+            </div>
           </div>
         </div>
       </div>
@@ -43,77 +51,145 @@ export function PredictionResult({ data }: PredictionResultProps) {
 
   const [team1, team2] = data.teams;
   const winnerEmoji = data.predicted_winner === 'Draw' ? '🤝' : '🏆';
+  const isWinnerTeam1 = data.predicted_winner === team1;
+  const isWinnerTeam2 = data.predicted_winner === team2;
+  const isDraw = data.predicted_winner === 'Draw';
   
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-          Prediction Result
+    <div className="space-y-8">
+      {/* Results Header */}
+      <div className="text-center space-y-4">
+        <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-100 to-blue-100 dark:from-green-900/30 dark:to-blue-900/30 rounded-full">
+          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            PREDICTION COMPLETE
+          </span>
+          <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse delay-500"></div>
+        </div>
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+          Match Analysis Results
         </h2>
-        <p className="text-gray-600 dark:text-gray-300">
-          {data.prediction_type === 'basic' ? 'Basic' : 'Advanced'} Analysis
+        <p className="text-gray-600 dark:text-gray-300 max-w-md mx-auto">
+          {data.prediction_type === 'basic' ? 'Basic Statistical Analysis' : 'Advanced Multi-Metric Analysis'}
         </p>
       </div>
 
-      {/* Match Header */}
-      <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-        <div className="text-center">
-          <div className="text-lg font-semibold text-gray-800 dark:text-white">
-            {team1} vs {team2}
+      {/* Match Visualization */}
+      <div className="relative bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-3xl p-8 border border-gray-200 dark:border-gray-600">
+        <div className="absolute top-4 right-4 opacity-20 text-6xl">⚽</div>
+        
+        <div className="grid grid-cols-3 gap-6 items-center">
+          {/* Team 1 */}
+          <div className={`text-center p-4 rounded-2xl transition-all ${
+            isWinnerTeam1 ? 'bg-gradient-to-br from-green-200 to-green-300 dark:from-green-800/50 dark:to-green-700/30 ring-4 ring-green-400/50' : 'bg-white/50 dark:bg-gray-600/30'
+          }`}>
+            <div className={`text-2xl font-bold mb-2 ${isWinnerTeam1 ? 'text-green-800 dark:text-green-200' : 'text-gray-800 dark:text-white'}`}>
+              {team1}
+            </div>
+            <div className="text-4xl font-bold text-gray-800 dark:text-white">
+              {data.team1_score}
+            </div>
+            {isWinnerTeam1 && (
+              <div className="mt-2 text-green-600 dark:text-green-400 font-semibold">
+                WINNER 🏆
+              </div>
+            )}
+          </div>
+
+          {/* VS Section */}
+          <div className="text-center">
+            <div className="text-6xl mb-2">{winnerEmoji}</div>
+            <div className="text-lg font-bold text-gray-600 dark:text-gray-400">
+              VS
+            </div>
+          </div>
+
+          {/* Team 2 */}
+          <div className={`text-center p-4 rounded-2xl transition-all ${
+            isWinnerTeam2 ? 'bg-gradient-to-br from-blue-200 to-blue-300 dark:from-blue-800/50 dark:to-blue-700/30 ring-4 ring-blue-400/50' : 'bg-white/50 dark:bg-gray-600/30'
+          }`}>
+            <div className={`text-2xl font-bold mb-2 ${isWinnerTeam2 ? 'text-blue-800 dark:text-blue-200' : 'text-gray-800 dark:text-white'}`}>
+              {team2}
+            </div>
+            <div className="text-4xl font-bold text-gray-800 dark:text-white">
+              {data.team2_score}
+            </div>
+            {isWinnerTeam2 && (
+              <div className="mt-2 text-blue-600 dark:text-blue-400 font-semibold">
+                WINNER 🏆
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Winner Announcement */}
+        <div className={`mt-6 text-center p-4 rounded-2xl ${
+          isDraw ? 'bg-gradient-to-r from-yellow-200 to-orange-200 dark:from-yellow-800/30 dark:to-orange-800/20' :
+          isWinnerTeam1 ? 'bg-gradient-to-r from-green-200 to-green-300 dark:from-green-800/30 dark:to-green-700/20' :
+          'bg-gradient-to-r from-blue-200 to-blue-300 dark:from-blue-800/30 dark:to-blue-700/20'
+        }`}>
+          <div className="text-2xl font-bold text-gray-800 dark:text-white">
+            {isDraw ? '🤝 Match Predicted as Draw' : `🏆 ${data.predicted_winner} Victory Predicted`}
           </div>
         </div>
       </div>
 
-      {/* Prediction Winner */}
-      <div className="text-center bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-xl p-6">
-        <div className="text-6xl mb-2">{winnerEmoji}</div>
-        <div className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-          Predicted Winner: {data.predicted_winner}
-        </div>
-        <div className="text-gray-600 dark:text-gray-300">
-          Score: {team1} {data.team1_score} - {data.team2_score} {team2}
-        </div>
-      </div>
-
-      {/* Comparisons */}
+      {/* Metric Comparisons */}
       {data.comparisons && data.comparisons.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
-            Metric Comparisons
-          </h3>
-          <div className="space-y-3">
+        <div className="space-y-6">
+          <div className="text-center">
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+              Statistical Breakdown
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Head-to-head metric comparisons
+            </p>
+          </div>
+          
+          <div className="grid gap-4">
             {data.comparisons.map((comparison, index) => (
               <div
                 key={index}
-                className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl p-4"
+                className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all"
               >
-                <div className="font-semibold text-gray-800 dark:text-white mb-2">
-                  {comparison.metric}
+                <div className="text-center mb-4">
+                  <h4 className="text-lg font-bold text-gray-800 dark:text-white">
+                    {comparison.metric}
+                  </h4>
                 </div>
-                <div className="grid grid-cols-3 gap-4 items-center">
-                  <div className="text-center">
-                    <div className="text-sm text-gray-600 dark:text-gray-300">{team1}</div>
-                    <div className="text-lg font-semibold text-gray-800 dark:text-white">
+                
+                <div className="grid grid-cols-3 gap-6 items-center">
+                  {/* Team 1 Stats */}
+                  <div className={`text-center p-4 rounded-xl ${
+                    comparison.winner === team1 ? 'bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/30 dark:to-green-800/20 ring-2 ring-green-400' : 'bg-gray-50 dark:bg-gray-700'
+                  }`}>
+                    <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                      {team1}
+                    </div>
+                    <div className="text-2xl font-bold text-gray-800 dark:text-white">
                       {comparison.team1_value}
                     </div>
                   </div>
+
+                  {/* Winner Badge */}
                   <div className="text-center">
-                    <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                      Winner
-                    </div>
-                    <div className={`text-lg font-bold ${
-                      comparison.winner === team1
-                        ? 'text-green-600 dark:text-green-400'
-                        : comparison.winner === team2
-                        ? 'text-blue-600 dark:text-blue-400'
-                        : 'text-gray-600 dark:text-gray-400'
+                    <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-bold ${
+                      comparison.winner === team1 ? 'bg-green-500 text-white' :
+                      comparison.winner === team2 ? 'bg-blue-500 text-white' :
+                      'bg-gray-400 text-white'
                     }`}>
-                      {comparison.winner}
+                      {comparison.winner === 'Draw' ? '🤝' : '👑'} {comparison.winner}
                     </div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-sm text-gray-600 dark:text-gray-300">{team2}</div>
-                    <div className="text-lg font-semibold text-gray-800 dark:text-white">
+
+                  {/* Team 2 Stats */}
+                  <div className={`text-center p-4 rounded-xl ${
+                    comparison.winner === team2 ? 'bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/20 ring-2 ring-blue-400' : 'bg-gray-50 dark:bg-gray-700'
+                  }`}>
+                    <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                      {team2}
+                    </div>
+                    <div className="text-2xl font-bold text-gray-800 dark:text-white">
                       {comparison.team2_value}
                     </div>
                   </div>
@@ -124,30 +200,40 @@ export function PredictionResult({ data }: PredictionResultProps) {
         </div>
       )}
 
-      {/* Stats Summary */}
+      {/* Team Statistics */}
       {data.stats_summary && data.stats_summary.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
-            Team Statistics
-          </h3>
-          <div className="grid gap-4">
+        <div className="space-y-6">
+          <div className="text-center">
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+              Detailed Team Statistics
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Complete performance metrics
+            </p>
+          </div>
+          
+          <div className="grid gap-6">
             {data.stats_summary.map((teamStats, index) => (
               <div
                 key={index}
-                className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl p-4"
+                className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-2xl p-6 shadow-lg"
               >
-                <div className="font-semibold text-lg text-gray-800 dark:text-white mb-3">
-                  {teamStats.Squad}
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className={`w-4 h-4 rounded-full ${index === 0 ? 'bg-green-500' : 'bg-blue-500'}`}></div>
+                  <h4 className="text-xl font-bold text-gray-800 dark:text-white">
+                    {teamStats.Squad}
+                  </h4>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {Object.entries(teamStats).map(([key, value]) => {
                     if (key === 'Squad') return null;
                     return (
-                      <div key={key} className="text-center">
-                        <div className="text-sm text-gray-600 dark:text-gray-300">
-                          {key.replace(/_/g, ' ')}
+                      <div key={key} className="bg-white dark:bg-gray-800 rounded-xl p-4 text-center border border-gray-200 dark:border-gray-600">
+                        <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          {key.replace(/_/g, ' ').toUpperCase()}
                         </div>
-                        <div className="text-lg font-semibold text-gray-800 dark:text-white">
+                        <div className="text-lg font-bold text-gray-800 dark:text-white">
                           {typeof value === 'number' ? value.toFixed(1) : value}
                         </div>
                       </div>
@@ -162,12 +248,14 @@ export function PredictionResult({ data }: PredictionResultProps) {
 
       {/* Disclaimer */}
       {data.disclaimer && (
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
-          <div className="flex items-start space-x-2">
-            <div className="text-yellow-600 dark:text-yellow-400 text-lg">⚠️</div>
-            <div className="text-sm text-yellow-800 dark:text-yellow-200">
-              <div className="font-semibold mb-1">Important Note:</div>
-              <div>{data.disclaimer}</div>
+        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-2 border-yellow-300 dark:border-yellow-700 rounded-2xl p-6">
+          <div className="flex items-start space-x-4">
+            <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-lg">⚠️</span>
+            </div>
+            <div className="text-yellow-800 dark:text-yellow-200">
+              <div className="font-bold text-lg mb-2">Important Note</div>
+              <div className="text-sm leading-relaxed">{data.disclaimer}</div>
             </div>
           </div>
         </div>
