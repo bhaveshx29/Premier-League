@@ -9,18 +9,9 @@ import time
 import random
 
 
-def _install_packages():
-    """Installs required packages if not available."""
-    for pkg in ("selenium", "beautifulsoup4", "lxml"):
-        try:
-            __import__(pkg)
-        except ImportError:
-            subprocess.check_call([sys.executable, "-m", "pip", "-q", "install", pkg])
-
-
 class PremierLeaguePredictor:
     def __init__(self):
-        _install_packages()
+        pass
     
     def _get_chrome_driver(self):
         """Initialize Chrome driver with proper options."""

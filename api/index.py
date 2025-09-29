@@ -2,25 +2,11 @@ from http.server import BaseHTTPRequestHandler
 import json
 import sys
 import os
-import subprocess
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
-try:
-    from predictor import PremierLeaguePredictor
-except ImportError:
-    # Fallback if imports fail
-    PremierLeaguePredictor = None
-
-def install_packages():
-    """Install required packages for Vercel environment."""
-    packages = ["selenium", "beautifulsoup4", "lxml", "pandas"]
-    for package in packages:
-        try:
-            __import__(package.replace('-', '_'))
-        except ImportError:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+from predictor import PremierLeaguePredictor
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -60,12 +46,6 @@ class handler(BaseHTTPRequestHandler):
 
     def handle_teams(self):
         try:
-            # Install packages if needed
-            install_packages()
-            
-            if PremierLeaguePredictor is None:
-                raise ImportError("Could not import predictor")
-                
             predictor = PremierLeaguePredictor()
             result = predictor.get_available_teams()
             
@@ -108,12 +88,6 @@ class handler(BaseHTTPRequestHandler):
             if team1 == team2:
                 raise ValueError("Teams must be different")
             
-            # Install packages if needed
-            install_packages()
-            
-            if PremierLeaguePredictor is None:
-                raise ImportError("Could not import predictor")
-            
             predictor = PremierLeaguePredictor()
             
             if prediction_type == 'basic':
@@ -151,12 +125,6 @@ class handler(BaseHTTPRequestHandler):
             prediction_type = path_parts[3]  # basic or advanced
             team1 = path_parts[4].replace('%20', ' ')
             team2 = path_parts[5].replace('%20', ' ')
-            
-            # Install packages if needed
-            install_packages()
-            
-            if PremierLeaguePredictor is None:
-                raise ImportError("Could not import predictor")
             
             predictor = PremierLeaguePredictor()
             
