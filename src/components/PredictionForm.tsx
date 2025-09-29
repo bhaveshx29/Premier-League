@@ -12,22 +12,64 @@ export function PredictionForm({ availableTeams, onPredict, isLoading }: Predict
   const [team1, setTeam1] = useState('');
   const [team2, setTeam2] = useState('');
   const [predictionType, setPredictionType] = useState('basic');
+  const [showTeam1Suggestions, setShowTeam1Suggestions] = useState(false);
+  const [showTeam2Suggestions, setShowTeam2Suggestions] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (team1 && team2 && team1 !== team2) {
-      onPredict(team1, team2, predictionType);
+    
+    // Check if the entered team names exist in the available teams (case-insensitive)
+    const team1Match = availableTeams.find(team => 
+      team.toLowerCase() === team1.toLowerCase()
+    );
+    const team2Match = availableTeams.find(team => 
+      team.toLowerCase() === team2.toLowerCase()
+    );
+    
+    if (team1Match && team2Match && team1Match !== team2Match) {
+      onPredict(team1Match, team2Match, predictionType);
+    } else if (!team1Match || !team2Match) {
+      alert('Please select valid team names from the suggestions.');
+    } else if (team1Match === team2Match) {
+      alert('Please select two different teams.');
     }
+  };
+
+  const getFilteredTeams = (input: string, excludeTeam?: string) => {
+    if (!input) return availableTeams.filter(team => team !== excludeTeam);
+    return availableTeams.filter(team => 
+      team.toLowerCase().includes(input.toLowerCase()) && team !== excludeTeam
+    );
+  };
+
+  const handleTeam1Change = (value: string) => {
+    setTeam1(value);
+    setShowTeam1Suggestions(true);
+  };
+
+  const handleTeam2Change = (value: string) => {
+    setTeam2(value);
+    setShowTeam2Suggestions(true);
+  };
+
+  const selectTeam1 = (team: string) => {
+    setTeam1(team);
+    setShowTeam1Suggestions(false);
+  };
+
+  const selectTeam2 = (team: string) => {
+    setTeam2(team);
+    setShowTeam2Suggestions(false);
   };
 
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-          Select Teams
+          Enter Teams
         </h2>
         <p className="text-gray-600 dark:text-gray-300">
-          Choose two Premier League teams to compare
+          Type Premier League team names to compare
         </p>
       </div>
 
@@ -75,49 +117,81 @@ export function PredictionForm({ availableTeams, onPredict, isLoading }: Predict
 
         {/* Team Selection */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Team 1
             </label>
-            <select
+            <input
+              type="text"
               value={team1}
-              onChange={(e) => setTeam1(e.target.value)}
+              onChange={(e) => handleTeam1Change(e.target.value)}
+              onFocus={() => setShowTeam1Suggestions(true)}
+              onBlur={() => setTimeout(() => setShowTeam1Suggestions(false), 150)}
+              placeholder="Type team name..."
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
               required
-            >
-              <option value="">Select Team 1</option>
-              {availableTeams.map((team) => (
-                <option key={team} value={team} disabled={team === team2}>
-                  {team}
-                </option>
-              ))}
-            </select>
+            />
+            {showTeam1Suggestions && (
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl shadow-lg max-h-40 overflow-y-auto">
+                {getFilteredTeams(team1, team2).map((team) => (
+                  <button
+                    key={team}
+                    type="button"
+                    onClick={() => selectTeam1(team)}
+                    className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-800 dark:text-white first:rounded-t-xl last:rounded-b-xl"
+                  >
+                    {team}
+                  </button>
+                ))}
+                {getFilteredTeams(team1, team2).length === 0 && (
+                  <div className="px-3 py-2 text-gray-500 dark:text-gray-400">
+                    No teams found
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          <div>
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Team 2
             </label>
-            <select
+            <input
+              type="text"
               value={team2}
-              onChange={(e) => setTeam2(e.target.value)}
+              onChange={(e) => handleTeam2Change(e.target.value)}
+              onFocus={() => setShowTeam2Suggestions(true)}
+              onBlur={() => setTimeout(() => setShowTeam2Suggestions(false), 150)}
+              placeholder="Type team name..."
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
               required
-            >
-              <option value="">Select Team 2</option>
-              {availableTeams.map((team) => (
-                <option key={team} value={team} disabled={team === team1}>
-                  {team}
-                </option>
-              ))}
-            </select>
+            />
+            {showTeam2Suggestions && (
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl shadow-lg max-h-40 overflow-y-auto">
+                {getFilteredTeams(team2, team1).map((team) => (
+                  <button
+                    key={team}
+                    type="button"
+                    onClick={() => selectTeam2(team)}
+                    className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-800 dark:text-white first:rounded-t-xl last:rounded-b-xl"
+                  >
+                    {team}
+                  </button>
+                ))}
+                {getFilteredTeams(team2, team1).length === 0 && (
+                  <div className="px-3 py-2 text-gray-500 dark:text-gray-400">
+                    No teams found
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={!team1 || !team2 || team1 === team2 || isLoading}
+          disabled={!team1 || !team2 || isLoading}
           className="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:from-green-700 hover:to-blue-700 transition-all"
         >
           {isLoading ? (
